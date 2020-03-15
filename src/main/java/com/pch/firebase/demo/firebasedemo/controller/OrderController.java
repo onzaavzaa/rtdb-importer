@@ -1,10 +1,7 @@
 package com.pch.firebase.demo.firebasedemo.controller;
 
 import com.google.common.collect.Lists;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseException;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.*;
 import com.pch.firebase.demo.firebasedemo.FirebaseRTDBAdapter;
 import com.pch.firebase.demo.firebasedemo.entity.*;
 import com.pch.firebase.demo.firebasedemo.mapper.OrderEntityMapper;
@@ -277,6 +274,12 @@ public class OrderController {
                 int i=1;
                 List<com.pch.firebase.demo.firebasedemo.rtdb.model.Order> orders = new ArrayList<>();
                 com.pch.firebase.demo.firebasedemo.rtdb.model.Order order = null;
+
+                SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM d yyyy HH:mm:ss zZ (zzzz)");
+                sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+                Date curDate = new Date();
+                String updateDateStr = sdf.format(curDate);
+
                 for (DataSnapshot child : dataSnapshot.getChildren()) {
 
                     try {
@@ -284,7 +287,7 @@ public class OrderController {
                         orders.add(order);
 
                         Map<String, Object> updateDate = new HashMap<>();
-                        updateDate.put("updateDate", "Sat Mar 28 2020 08:41:43 GMT+0700 (Indochina Time)");
+                        updateDate.put("updateDate",updateDateStr);
                         child.getRef().updateChildrenAsync(updateDate);
 
                     }catch (DatabaseException e){
@@ -341,7 +344,7 @@ public class OrderController {
 
     @GetMapping("/findRtdbOrderById/{orderId}")
     public String findRTDBBYID(@PathVariable String orderId){
-
+        Map<String, String> stringStringMap = ServerValue.TIMESTAMP;
         rtdBorderService.findOrderById(orderId);
 
         return "Done";

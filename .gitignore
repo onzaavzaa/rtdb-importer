@@ -39,4 +39,5 @@ transaction-logs
 secrets.yml
 .gradletasknamecache
 .sts4-cache
+firebase-key.json
 © 2020 GitHub, Inc.

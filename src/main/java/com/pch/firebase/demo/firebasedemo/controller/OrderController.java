@@ -2,7 +2,7 @@ package com.pch.firebase.demo.firebasedemo.controller;
 
 import com.google.common.collect.Lists;
 import com.google.firebase.database.*;
-import com.pch.firebase.demo.firebasedemo.FirebaseRTDBAdapter;
+import com.pch.firebase.demo.firebasedemo.adapter.FirebaseRTDBAdapter;
 import com.pch.firebase.demo.firebasedemo.entity.*;
 import com.pch.firebase.demo.firebasedemo.mapper.OrderEntityMapper;
 import com.pch.firebase.demo.firebasedemo.repository.OrderItemRepository;
@@ -15,10 +15,10 @@ import com.pch.firebase.demo.firebasedemo.service.AsyncSave;
 import com.pch.firebase.demo.firebasedemo.service.RTDBorderService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.management.Query;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -54,6 +54,8 @@ public class OrderController {
     private AsyncOrderDetailService asyncOrderDetailService;
     @Autowired
     private RTDBorderService rtdBorderService;
+    @Autowired
+    private Environment env;
 
     @GetMapping("/createOrder")
     public String createOrder() {
@@ -262,7 +264,7 @@ public class OrderController {
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
         String currentDate = sdf.format(queryDate);
 
-        firebaseRTDBAdapter.getDbRef()
+        firebaseRTDBAdapter.getDbRefOrder()
                 .orderByChild("createDate")
                 .startAt(currentDate)
                 .endAt(currentDate+"\\uf8ff")
@@ -345,7 +347,7 @@ public class OrderController {
     @GetMapping("/findRtdbOrderById/{orderId}")
     public String findRTDBBYID(@PathVariable String orderId){
         Map<String, String> stringStringMap = ServerValue.TIMESTAMP;
-        rtdBorderService.findOrderById(orderId);
+        env.getProperty("app");
 
         return "Done";
     }

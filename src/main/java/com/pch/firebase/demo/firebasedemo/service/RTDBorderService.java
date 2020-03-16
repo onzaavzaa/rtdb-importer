@@ -1,18 +1,13 @@
 package com.pch.firebase.demo.firebasedemo.service;
 
-import com.google.common.collect.Lists;
 import com.google.firebase.database.*;
-import com.pch.firebase.demo.firebasedemo.FirebaseRTDBAdapter;
-import com.pch.firebase.demo.firebasedemo.entity.TrOrderDEntity;
+import com.pch.firebase.demo.firebasedemo.adapter.FirebaseRTDBAdapter;
 import com.pch.firebase.demo.firebasedemo.entity.TrOrderHEntity;
 import com.pch.firebase.demo.firebasedemo.rtdb.model.Order;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Service
 public class RTDBorderService {
@@ -23,7 +18,7 @@ public class RTDBorderService {
     public void updateOrderDateWhenCompleteImport(List<TrOrderHEntity> trOrderHEntities){
 
         for (TrOrderHEntity hEntity: trOrderHEntities){
-            DatabaseReference orderRef= firebaseRTDBAdapter.getDbRef();
+            DatabaseReference orderRef= firebaseRTDBAdapter.getDbRefOrder();
             orderRef.orderByChild("orderCode")
                     .equalTo(hEntity.getTohCode());
 
@@ -37,7 +32,7 @@ public class RTDBorderService {
     }
 
     public Order findOrderById(String orderId){
-        DatabaseReference reference= firebaseRTDBAdapter.getDbRef();
+        DatabaseReference reference= firebaseRTDBAdapter.getDbRefOrder();
         reference.orderByChild("orderCode")
                 .equalTo(orderId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {

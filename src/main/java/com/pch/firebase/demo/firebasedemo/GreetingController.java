@@ -1,20 +1,13 @@
 package com.pch.firebase.demo.firebasedemo;
 
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.*;
+import com.pch.firebase.demo.firebasedemo.adapter.FirebaseRTDBAdapter;
 import com.pch.firebase.demo.firebasedemo.repository.UserRepository;
 import com.pch.firebase.demo.firebasedemo.rtdb.model.Order;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

@@ -6,6 +6,7 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.*;
 import com.pch.firebase.demo.firebasedemo.rtdb.model.Order;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -21,5 +22,6 @@ public class FirebaseDemoApplication {
 		SpringApplication.run(FirebaseDemoApplication.class, args);
 
 	}
+
 
 }

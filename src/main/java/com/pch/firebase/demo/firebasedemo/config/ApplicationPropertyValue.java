@@ -24,10 +24,10 @@ public class ApplicationPropertyValue {
     @Value("${app.firebase.rtdb.ref.order}")
     private String rtdbRefOrder;
 
-    public ApplicationPropertyValue() {
-        System.out.println("ApplicationPropertyValue");
-    }
+    @Value("${app.firebase.rtdb.ref.cycle}")
+    private String rtdbRefCycle;
 
-
+    @Value("${app.firebase.rtdb.ref.reward}")
+    private String rtdbRefReward;
 
 }

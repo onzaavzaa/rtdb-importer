@@ -60,6 +60,14 @@ public class FirebaseRTDBAdapter {
         return this.database.getReference(appPropertyValue.getRtdbRefOrder());
     }
 
+    public DatabaseReference getDbRefCycle() {
+        return this.database.getReference("cycle");
+    }
+
+    public DatabaseReference getDbRefReward() {
+        return this.database.getReference("reward");
+    }
+
     public DatabaseReference getOrderDbRef() {
         return database.getReference("/order");
     }

@@ -9,6 +9,8 @@ import com.pch.firebase.demo.firebasedemo.repository.OrderItemRepository;
 import com.pch.firebase.demo.firebasedemo.repository.OrderRepository;
 import com.pch.firebase.demo.firebasedemo.repository.TrOrderDRepository;
 import com.pch.firebase.demo.firebasedemo.repository.TrOrderHRepository;
+import com.pch.firebase.demo.firebasedemo.rtdb.model.ImportOrderRequest;
+import com.pch.firebase.demo.firebasedemo.rtdb.model.ImportOrderResponse;
 import com.pch.firebase.demo.firebasedemo.service.AsyncOrderDetailService;
 import com.pch.firebase.demo.firebasedemo.service.AsyncOrderHeadService;
 import com.pch.firebase.demo.firebasedemo.service.AsyncSave;
@@ -27,6 +29,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 public class OrderController {
@@ -243,31 +246,27 @@ public class OrderController {
 
     @RequestMapping(
             value = {"/importRTDB/order","/importRTDB/order/{createDate}"},
-            method = GET,
+            method = POST,
             produces = { "application/json" }
     )
     @ResponseBody
-    public String importRTDB(@PathVariable Map<String, String> vals) throws ParseException {
+    public ImportOrderResponse importRTDB(@PathVariable Map<String, String> vals, @RequestBody ImportOrderRequest request) throws ParseException {
 
-        String queryDateStr = vals.get("createDate");
-        SimpleDateFormat queryDf = new SimpleDateFormat("yyyy-MM-dd");
-        queryDf.setTimeZone(TimeZone.getTimeZone("GMT"));
+        ImportOrderResponse response = new ImportOrderResponse();
+        response.setStatus(true);
+        response.setMsg("success");
+        response.setDesc("Server is processing your orders.");
 
-        Date queryDate = null;
-        if(StringUtils.isEmpty(queryDateStr)){
-            queryDate = new Date();
-        }else{
-            queryDate = queryDf.parse(queryDateStr);
-        }
-
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM d yyyy");
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-        String currentDate = sdf.format(queryDate);
+        // Close cycle
+        Map<String, Object> closeCycleObject = new HashMap<>();
+        closeCycleObject.put("cycleCode",request.getCycleCode());
+        closeCycleObject.put("cycleStatus","close");
+        firebaseRTDBAdapter.getDbRefCycle().child(request.getCycleCode()).setValueAsync(closeCycleObject);
 
         firebaseRTDBAdapter.getDbRefOrder()
-                .orderByChild("createDate")
-                .startAt(currentDate)
-                .endAt(currentDate+"\\uf8ff")
+                .orderByChild("cycleCode")
+                .startAt(request.getCycleCode())
+                .endAt(request.getCycleCode()+"\\uf8ff")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
             @SneakyThrows
             @Override
@@ -277,20 +276,11 @@ public class OrderController {
                 List<com.pch.firebase.demo.firebasedemo.rtdb.model.Order> orders = new ArrayList<>();
                 com.pch.firebase.demo.firebasedemo.rtdb.model.Order order = null;
 
-                SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM d yyyy HH:mm:ss zZ (zzzz)");
-                sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-                Date curDate = new Date();
-                String updateDateStr = sdf.format(curDate);
-
                 for (DataSnapshot child : dataSnapshot.getChildren()) {
 
                     try {
                         order = child.getValue(com.pch.firebase.demo.firebasedemo.rtdb.model.Order.class);
                         orders.add(order);
-
-                        Map<String, Object> updateDate = new HashMap<>();
-                        updateDate.put("updateDate",updateDateStr);
-                        child.getRef().updateChildrenAsync(updateDate);
 
                     }catch (DatabaseException e){
                         e.printStackTrace();
@@ -299,6 +289,7 @@ public class OrderController {
                     i++;
                 }
                 importedRows = orders.size();
+
                 if(importedRows>0){
                     orderEntityMapper.map(orders);
                     List<TrOrderHEntity> trOrderHEntities = orderEntityMapper.getOrderHeadEntities();
@@ -341,7 +332,7 @@ public class OrderController {
 
         System.out.println("------- Done.");
 
-        return "Done.";
+        return response;
     }
 
     @GetMapping("/findRtdbOrderById/{orderId}")
